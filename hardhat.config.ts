@@ -45,6 +45,9 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
+  namedAccounts: {
+    deployer: 0,
+  },
   solidity: {
     version: '0.8.0',
     settings: {

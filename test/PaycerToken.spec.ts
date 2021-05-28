@@ -1,35 +1,27 @@
-import { ethers } from 'hardhat'
+import { ethers, deployments } from 'hardhat'
 import { expect } from 'chai'
 
 describe('PaycerToken', function () {
   before(async function () {
-    this.PaycerToken = await ethers.getContractFactory('PaycerToken')
     this.signers = await ethers.getSigners()
     this.owner = this.signers[0]
     this.address1 = this.signers[1]
     this.address2 = this.signers[2]
-    this.initialSupply = 1000
-    this.totalSupply = 10000
-
+    this.initialSupply = 1000000
+    this.totalSupply = 750000000
   })
 
   beforeEach(async function () {
-    this.paycer = await this.PaycerToken.deploy(this.initialSupply, this.totalSupply)
-    await this.paycer.deployed()
+    await deployments.fixture(['PaycerToken'])
+    this.paycer = await ethers.getContract('PaycerToken', this.owner)
   })
 
   it('should have correct name, symbol, decimal and total supply', async function () {
-    const name = await this.paycer.name()
-    const symbol = await this.paycer.symbol()
-    const decimals = await this.paycer.decimals()
-    const totalSupply = await this.paycer.totalSupply()
-    const maxSupply = await this.paycer.cap()
-
-    expect(name).to.equal('PaycerToken')
-    expect(symbol).to.equal('PCR')
-    expect(decimals).to.equal(18)
-    expect(totalSupply.toNumber()).to.equal(this.initialSupply)
-    expect(maxSupply.toNumber()).to.equal(this.totalSupply)
+    expect(await this.paycer.name()).to.equal('PaycerToken')
+    expect(await this.paycer.symbol()).to.equal('PCR')
+    expect(await this.paycer.decimals()).to.equal(18)
+    expect(await this.paycer.totalSupply()).to.equal(this.initialSupply)
+    expect(await this.paycer.cap()).to.equal(this.totalSupply)
   })
 
   it('should allow owner to mint token', async function () {
@@ -44,8 +36,8 @@ describe('PaycerToken', function () {
     const balanceOfAddress1 = await this.paycer.balanceOf(this.address1.address)
     const balanceOfAddress2 = await this.paycer.balanceOf(this.address2.address)
 
-    expect(totalSupply.toNumber()).to.equal(3000)
-    expect(balanceOfOwner).to.equal(2000)
+    expect(totalSupply).to.equal(1002000)
+    expect(balanceOfOwner).to.equal(1001000)
     expect(balanceOfAddress1).to.equal(1000)
     expect(balanceOfAddress2).to.equal(0)
   })
@@ -62,7 +54,7 @@ describe('PaycerToken', function () {
   
   it('should not allow owner to mint more tokens if supply is exceeded', async function () {
     const owner = await this.paycer.connect(this.owner)
-    await expect(owner.mint(owner.address, 100000)).to.be.revertedWith('revert ERC20Capped: cap exceeded')
+    await expect(owner.mint(owner.address, 800000000)).to.be.revertedWith('revert ERC20Capped: cap exceeded')
   })
 
   it('Should transfer tokens between accounts', async function () {

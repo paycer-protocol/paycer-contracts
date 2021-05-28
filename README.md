@@ -10,17 +10,13 @@ These are the contracts for Paycer protocol.
 - VSCode Solidity Plugin
 - MetaMask
 
-# Obtain Infra API Key
-https://infura.io/dashboard
-
-# Obtain Alchemy API Key
-https://www.alchemy.com/
-
-# Obtain Etherscan API Key
- https://etherscan.io/
+# Obtain API Keys
+- https://infura.io/dashboard
+- https://www.alchemy.com/
+- https://etherscan.io/
 
 
-# commands
+# Commands
 ```
 # show all commands
 npx hardhat
@@ -35,7 +31,22 @@ npx hardhat test
 npx hardhat node
 
 # deploy contract to node on localhost
-npx hardhat run --network localhost scripts/deploy-paycer-token.ts
+npx hardhat --network <networkName> deploy
+```
+
+# Public Testnet Deployment
+```
+# Retrieve account infos and import one or more accounts to MetaMask
+hh accounts --net kovan
+
+# Obtain test tokens on faucet
+https://faucet.kovan.network/
+
+# Deploy token to kovan testnet
+npx hardhat run --network kovan scripts/deploy-paycer-token.ts
+
+# Check transaction on kovan explorer
+https://kovan.etherscan.io/tx/{transactionID}
 ```
 
 # Add hardhat network to MetaMask
@@ -52,5 +63,7 @@ Currency Symbol:
 ETH
 
 
-# Faucet
-https://faucet.kovan.network/
+# Knowledge Base
+[Ethereum Developers](https://ethereum.org/de/developers/)
+[Hardhat](https://hardhat.org/)
+[Deployment](https://hardhat.org/plugins/hardhat-deploy.html)
