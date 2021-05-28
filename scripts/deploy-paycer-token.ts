@@ -1,12 +1,8 @@
 import hre from 'hardhat'
-import ethers, { BigNumber } from 'ethers'
 
 async function main() {
-  const signers = await hre.ethers.getSigners()
-  const owner = signers[0]
-
   const PaycerToken = await hre.ethers.getContractFactory('PaycerToken')
-  const paycer = await PaycerToken.deploy(1000)
+  const paycer = await PaycerToken.deploy(1000 * 10^18)
 
   await paycer.deployed()
 

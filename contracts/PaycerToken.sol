@@ -8,8 +8,4 @@ contract PaycerToken is ERC20, Ownable {
     constructor(uint256 _initialSupply) ERC20('PaycerToken', 'PCR') {
         _mint(msg.sender, _initialSupply);
     }
-
-    function mint(address _to, uint256 _amount) public onlyOwner {
-        _mint(_to, _amount);
-    }
 }
