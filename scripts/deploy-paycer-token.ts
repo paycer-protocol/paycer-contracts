@@ -1,8 +1,12 @@
 import hre from 'hardhat'
+import { BigNumber } from 'ethers'
+
+const INITIAL_SUPPLY = '100000000000000000000000000'
+const TOTAL_SUPPLY   = '750000000000000000000000000'
 
 async function main() {
   const PaycerToken = await hre.ethers.getContractFactory('PaycerToken')
-  const paycer = await PaycerToken.deploy(1000 * 10^18)
+  const paycer = await PaycerToken.deploy(INITIAL_SUPPLY, TOTAL_SUPPLY)
 
   await paycer.deployed()
 

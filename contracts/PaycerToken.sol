@@ -2,10 +2,31 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract PaycerToken is ERC20, Ownable {
-    constructor(uint256 _initialSupply) ERC20('PaycerToken', 'PCR') {
-        _mint(msg.sender, _initialSupply);
+contract PaycerToken is ERC20Capped, Ownable {
+
+    /**
+     * @dev Sets the values for {_initialSupply} and {_totalSupply}.
+     *
+     * All two of these values are immutable: they can only be set once during
+     * construction.
+     */
+    constructor(uint256 _initialSupply, uint256 _totalSupply) ERC20('PaycerToken', 'PCR') ERC20Capped(_totalSupply) {
+        ERC20._mint(msg.sender, _initialSupply);
+    }
+
+    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+     * the total supply.
+     *
+     * Emits a {Transfer} event with `from` set to the zero address.
+     *
+     * Requirements:
+     *
+     * - `to` cannot be the zero address.
+     */
+    function mint(address _to, uint256 _amount) public onlyOwner {
+        _mint(_to, _amount);
     }
 }

@@ -2,6 +2,13 @@
 
 These are the contracts for Paycer protocol.
 
+# Requirements
+- NodeJS
+- Yarn
+- Git
+- VSCode
+- VSCode Solidity Plugin
+- MetaMask
 
 # Obtain Infra API Key
 https://infura.io/dashboard

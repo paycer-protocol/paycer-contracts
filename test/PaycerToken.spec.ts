@@ -5,13 +5,16 @@ describe('PaycerToken', function () {
   before(async function () {
     this.PaycerToken = await ethers.getContractFactory('PaycerToken')
     this.signers = await ethers.getSigners()
-    this.alice = this.signers[0]
-    this.bob = this.signers[1]
-    this.carol = this.signers[2]
+    this.owner = this.signers[0]
+    this.address1 = this.signers[1]
+    this.address2 = this.signers[2]
+    this.initialSupply = 1000
+    this.totalSupply = 10000
+
   })
 
   beforeEach(async function () {
-    this.paycer = await this.PaycerToken.deploy(1000)
+    this.paycer = await this.PaycerToken.deploy(this.initialSupply, this.totalSupply)
     await this.paycer.deployed()
   })
 
@@ -20,58 +23,65 @@ describe('PaycerToken', function () {
     const symbol = await this.paycer.symbol()
     const decimals = await this.paycer.decimals()
     const totalSupply = await this.paycer.totalSupply()
+    const maxSupply = await this.paycer.cap()
 
     expect(name).to.equal('PaycerToken')
     expect(symbol).to.equal('PCR')
     expect(decimals).to.equal(18)
-    expect(totalSupply.toNumber()).to.equal(1000)
+    expect(totalSupply.toNumber()).to.equal(this.initialSupply)
+    expect(maxSupply.toNumber()).to.equal(this.totalSupply)
   })
 
   it('should allow owner to mint token', async function () {
-    await this.paycer.mint(this.alice.address, 1000)
-    await this.paycer.mint(this.bob.address, 1000)
+    await this.paycer.mint(this.owner.address, 1000)
+    await this.paycer.mint(this.address1.address, 1000)
 
-    const bob = await this.paycer.connect(this.bob);
-    await expect(bob.mint(this.carol.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+    const address1 = await this.paycer.connect(this.address1);
+    await expect(address1.mint(this.address2.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
 
     const totalSupply = await this.paycer.totalSupply()
-    const balanceOfAlice = await this.paycer.balanceOf(this.alice.address)
-    const balanceOfBob = await this.paycer.balanceOf(this.bob.address)
-    const balanceOfCarol = await this.paycer.balanceOf(this.carol.address)
+    const balanceOfOwner = await this.paycer.balanceOf(this.owner.address)
+    const balanceOfAddress1 = await this.paycer.balanceOf(this.address1.address)
+    const balanceOfAddress2 = await this.paycer.balanceOf(this.address2.address)
 
     expect(totalSupply.toNumber()).to.equal(3000)
-    expect(balanceOfAlice).to.equal(2000)
-    expect(balanceOfBob).to.equal(1000)
-    expect(balanceOfCarol).to.equal(0)
+    expect(balanceOfOwner).to.equal(2000)
+    expect(balanceOfAddress1).to.equal(1000)
+    expect(balanceOfAddress2).to.equal(0)
   })
 
   it('should not allow others to mint token', async function () {
-    const bob = await this.paycer.connect(this.bob)
-    const carol = await this.paycer.connect(this.carol);
+    const address1 = await this.paycer.connect(this.address1)
+    const address2 = await this.paycer.connect(this.address2)
 
-    await expect(bob.mint(this.bob.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
-    await expect(carol.mint(this.carol.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
-    await expect(bob.mint(this.carol.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
-    await expect(carol.mint(this.bob.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+    await expect(address1.mint(this.address1.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+    await expect(address2.mint(this.address2.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+    await expect(address1.mint(this.address2.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+    await expect(address2.mint(this.address1.address, 1000)).to.be.revertedWith('Ownable: caller is not the owner')
+  })
+  
+  it('should not allow owner to mint more tokens if supply is exceeded', async function () {
+    const owner = await this.paycer.connect(this.owner)
+    await expect(owner.mint(owner.address, 100000)).to.be.revertedWith('revert ERC20Capped: cap exceeded')
   })
 
   it('Should transfer tokens between accounts', async function () {
-    const alice = await this.paycer.connect(this.alice)
+    const owner = await this.paycer.connect(this.owner)
 
-    await alice.transfer(this.bob.address, 100)
-    const balanceOfBob = await this.paycer.balanceOf(this.bob.address)
-    expect((balanceOfBob).toNumber()).to.equal(100)
+    await owner.transfer(this.address1.address, 100)
+    const balanceOfAddress1 = await this.paycer.balanceOf(this.address1.address)
+    expect((balanceOfAddress1).toNumber()).to.equal(100)
 
-    await alice.transfer(this.carol.address, 100)
-    const balanceOfCarol = await this.paycer.balanceOf(this.carol.address)
-    expect((balanceOfCarol).toNumber()).to.equal(100)
+    await owner.transfer(this.address2.address, 100)
+    const balanceOfAddress2 = await this.paycer.balanceOf(this.address2.address)
+    expect((balanceOfAddress2).toNumber()).to.equal(100)
   })
 
   it('should not send tokens if the balance has not enougth tokens', async function () {
-    const alice = await this.paycer.connect(this.alice)
-    const carol = await this.paycer.connect(this.carol)
+    const owner = await this.paycer.connect(this.owner)
+    const address2 = await this.paycer.connect(this.address2)
 
-    await expect(alice.transfer(this.bob.address, 10000000)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
-    await expect(carol.transfer(this.alice.address, 1)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
+    await expect(owner.transfer(this.address1.address, 10000000)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
+    await expect(address2.transfer(this.owner.address, 1)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
   })
 })
