@@ -1,11 +1,13 @@
-
 import 'dotenv/config'
 import '@openzeppelin/hardhat-upgrades'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-ethers'
+import '@nomiclabs/hardhat-solhint'
 import 'hardhat-deploy'
 import './tasks/accounts'
+
 import { HardhatUserConfig } from 'hardhat/types'
+import { removeConsoleLog } from 'hardhat-preprocessor'
 
 const accounts = {
   mnemonic: process.env.MNEMONIC,
@@ -49,7 +51,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   solidity: {
-    version: '0.8.0',
+    version: '0.6.12',
     settings: {
       optimizer: {
         enabled: true,
@@ -65,7 +67,10 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 20000
-  }
+  },
+  preprocess: {
+    eachLine: removeConsoleLog(bre => bre.network.name !== 'hardhat' && bre.network.name !== 'localhost'),
+  },
 }
 
 export default config;

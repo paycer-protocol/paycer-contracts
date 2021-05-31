@@ -45,6 +45,12 @@ https://faucet.kovan.network/
 # Deploy token to kovan testnet
 npx hardhat run --network kovan scripts/deploy-paycer-token.ts
 
+# Verify contract token to kovan testnet
+# Remove unnecessary contracts and clear the artifacts otherwise these will also be part of the verified contract.
+npx clean
+npx hardhat verify --network kovan DEPLOYED_CONTRACT_ADDRESS {address}
+
+
 # Check transaction on kovan explorer
 https://kovan.etherscan.io/tx/{transactionID}
 ```
