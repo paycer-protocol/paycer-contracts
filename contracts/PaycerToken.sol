@@ -29,4 +29,15 @@ contract PaycerToken is ERC20Capped, Ownable {
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
     }
+
+
+    function getChainId() external view returns (uint256) {
+        uint256 chainId;
+        
+        assembly {
+            chainId := chainid()
+        }
+
+        return chainId;
+    }
 }

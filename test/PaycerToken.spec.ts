@@ -22,6 +22,7 @@ describe('PaycerToken', function () {
     expect(await this.paycer.decimals()).to.equal(18)
     expect(await this.paycer.totalSupply()).to.equal(this.initialSupply)
     expect(await this.paycer.cap()).to.equal(this.totalSupply)
+    expect(await this.paycer.getChainId()).to.equal(31337)
   })
 
   it('should allow owner to mint token', async function () {
