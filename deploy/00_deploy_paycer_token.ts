@@ -6,14 +6,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre
   const { deploy } = deployments
 
-  const { deployer } = await getNamedAccounts();
+  const { owner } = await getNamedAccounts();
 
-  const initialSupply = 1000000
-  const totalSupply   = 750000000
+  const totalSupply = 750000000
 
   await deploy('PaycerToken', {
-    from: deployer,
-    args: [initialSupply, totalSupply],
+    from: owner,
+    args: [totalSupply],
     log: true,
   })
 }

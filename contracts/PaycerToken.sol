@@ -7,29 +7,11 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract PaycerToken is ERC20Capped, Ownable {
 
-    /**
-     * @dev Sets the values for {_initialSupply} and {_totalSupply}.
-     *
-     * All two of these values are immutable: they can only be set once during
-     * construction.
-     */
-    constructor(uint256 _initialSupply, uint256 _totalSupply) ERC20('PaycerToken', 'PCR') ERC20Capped(_totalSupply) {
-        ERC20._mint(msg.sender, _initialSupply);
-    }
+    /* ========== CONSTRUCTOR ========== */
 
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
-     * the total supply.
-     *
-     * Emits a {Transfer} event with `from` set to the zero address.
-     *
-     * Requirements:
-     *
-     * - `to` cannot be the zero address.
-     */
-    function mint(address _to, uint256 _amount) public onlyOwner {
-        _mint(_to, _amount);
-    }
+    constructor(uint256 _totalSupply) ERC20('PaycerToken', 'PCR') ERC20Capped(_totalSupply) {}
 
+    /* ========== VIEWS ========== */
 
     function getChainId() external view returns (uint256) {
         uint256 chainId;
@@ -39,5 +21,11 @@ contract PaycerToken is ERC20Capped, Ownable {
         }
 
         return chainId;
+    }
+
+    /* ========== MUTATIVE FUNCTIONS ========== */
+    
+    function mint(address _to, uint256 _amount) public onlyOwner {
+        _mint(_to, _amount);
     }
 }

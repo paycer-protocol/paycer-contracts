@@ -14,6 +14,7 @@ describe('PaycerToken', function () {
   beforeEach(async function () {
     await deployments.fixture(['PaycerToken'])
     this.paycer = await ethers.getContract('PaycerToken', this.owner)
+    this.paycer.mint(this.owner.address, this.initialSupply)
   })
 
   it('should have correct name, symbol, decimal and total supply', async function () {
