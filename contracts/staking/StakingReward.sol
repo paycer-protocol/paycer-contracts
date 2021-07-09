@@ -20,10 +20,10 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
     IERC20 private _baseToken;
     IRewardTreasury private _rewardTreasury;
     uint256 private _totalStaked;
-    uint256 private _rewardRate = 10;
 
     mapping(address => uint256) private _stakedBalances;
     mapping(address => uint256) private _rewardBalances;
+    mapping(address => uint256) private _lockPeriods;
     mapping(address => uint256) private _lastStakeTimes;
     mapping(address => uint256) private _lastWithdrawTimes;
     mapping(address => uint256) private _lastClaimTimes;
@@ -31,7 +31,7 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     /* ========== EVENTS ========== */
 
-    event Staked(address indexed account, uint256 amount);
+    event Staked(address indexed account, uint256 amount, uint256 lockPeriod);
     event Withdrawn(address indexed account, uint256 amount);
     event Claimed(address indexed account, uint256 amount);
 
@@ -66,10 +66,7 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
         return _lastWithdrawTimes[account];
     }
 
-    function rewardRate() public view virtual returns (uint256) {
-        return _rewardRate;
-    }
-
+   
     function rewardBalanceOf(address account) public view virtual returns (uint256)  {
         return _rewardBalances[account];
     }
@@ -77,7 +74,7 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     
-    function stake(uint256 amount) external nonReentrant whenNotPaused calculateReward(msg.sender) {
+    function stake(uint256 amount, uint256 lockPeriod) external nonReentrant whenNotPaused calculateReward(msg.sender) {
         require(amount > 0, 'Amount must be greater than 0');
         require(_baseToken.balanceOf(msg.sender) >= amount, 'Not enough tokens in the wallet');
 
@@ -87,18 +84,29 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
         // add account to staked balances
         _stakedBalances[msg.sender] = _stakedBalances[msg.sender].add(amount);
 
+        // add lock period in days
+        _lockPeriods[msg.sender] = _lockPeriods[msg.sender].add(lockPeriod);
+
         // lock tokens in the contract
         _baseToken.safeTransferFrom(msg.sender, address(this), amount);
 
         // add timestamp to account
         _lastStakeTimes[msg.sender] = block.timestamp;
 
-        emit Staked(msg.sender, amount);
+        emit Staked(msg.sender, amount, lockPeriod);
     }
 
     function withdraw(uint256 amount) external nonReentrant whenNotPaused calculateReward(msg.sender) {
         require(amount > 0, 'Amount must be greater than 0');
         require(stakedBalanceOf(msg.sender) >= amount, 'Amount must be greater or equal to staked amount');
+
+
+        if (_lockPeriods[msg.sender] > 0) {
+            uint256 lastStakeTime = _lastStakeTimes[msg.sender];
+            uint256 releaseTime = lastStakeTime + _lockPeriods[msg.sender] * 1 days;
+
+            require(block.timestamp >= releaseTime, 'Lock period not exceeded');
+        }
 
         // subtract total staked tokens
         _totalStaked = _totalStaked.sub(amount);

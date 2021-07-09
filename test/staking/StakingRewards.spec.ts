@@ -33,21 +33,21 @@ describe('StakingRewards', function () {
   
     it('should not allow enter if not enough approve', async function () {
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(100),
+        this.stakingContract.connect(this.address1).stake(100, 0),
         'ERC20: transfer amount exceeds allowance'
       )
   
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 50);
   
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(100),
+        this.stakingContract.connect(this.address1).stake(100, 0),
         'ERC20: transfer amount exceeds allowance'
       )
     })
   
     it('should allow enter if enough approve', async function () {
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 100)
-      this.stakingContract.connect(this.address1).stake(100)
+      this.stakingContract.connect(this.address1).stake(100, 0)
   
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(900)
       expect(await this.paycer.balanceOf(this.stakingContract.address)).to.equal(100)
@@ -57,26 +57,26 @@ describe('StakingRewards', function () {
       const address1 = await this.paycer.connect(this.address1)
       await address1.approve(this.stakingContract.address, 100)
   
-      await expect(this.stakingContract.connect(this.address1).stake(0)).to.be.revertedWith('Amount must be greater than 0')
-      await expect(this.stakingContract.connect(this.address1).stake(10000)).to.be.revertedWith('Not enough tokens in the wallet')
+      await expect(this.stakingContract.connect(this.address1).stake(0, 0)).to.be.revertedWith('Amount must be greater than 0')
+      await expect(this.stakingContract.connect(this.address1).stake(10000, 0)).to.be.revertedWith('Not enough tokens in the wallet')
     })
   
     it('should allow staking with valid token amount', async function () {
       const address1 = await this.paycer.connect(this.address1)
       await address1.approve(this.stakingContract.address, 200)
   
-      await this.stakingContract.connect(this.address1).stake(100)
+      await this.stakingContract.connect(this.address1).stake(100, 0)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(900)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(100)
   
-      await this.stakingContract.connect(this.address1).stake(100)
+      await this.stakingContract.connect(this.address1).stake(100, 0)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(800)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(200)
   
       expect(await this.stakingContract.totalStakedBalances()).to.equal(200)
   
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(1000),
+        this.stakingContract.connect(this.address1).stake(1000, 0),
         'Not enough tokens in the wallet'
       )
     })
@@ -99,10 +99,37 @@ describe('StakingRewards', function () {
       )
     })
 
+    it('should not allow if lock period not exceeded', async function () {
+      const address1 = await this.paycer.connect(this.address1)
+      await address1.approve(this.stakingContract.address, 200)
+  
+      await this.stakingContract.connect(this.address1).stake(100, 14)
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).withdraw(100),
+        'Lock period not exceeded'
+      )
+
+      await this.stakingContract.connect(this.address1).stake(25, 1)
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).withdraw(100),
+        'Lock period not exceeded'
+      )
+
+      await this.stakingContract.connect(this.address1).stake(25, 0)
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).withdraw(100),
+        'Lock period not exceeded'
+      )
+      
+    })
+
     it('should allow withdraw', async function () {
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 200)
 
-      await this.stakingContract.connect(this.address1).stake(200)
+      await this.stakingContract.connect(this.address1).stake(200, 0)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(800)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(200)
       expect(await this.stakingContract.totalStakedBalances()).to.equal(200)
