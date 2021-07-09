@@ -20,6 +20,8 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
     IERC20 private _baseToken;
     IRewardTreasury private _rewardTreasury;
     uint256 private _totalStaked;
+    uint256 private _minLockDays = 2;
+    uint256 private _maxLockDays = 365;
 
     mapping(address => uint256) private _stakedBalances;
     mapping(address => uint256) private _rewardBalances;
@@ -77,6 +79,7 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
     function stake(uint256 amount, uint256 lockPeriod) external nonReentrant whenNotPaused calculateReward(msg.sender) {
         require(amount > 0, 'Amount must be greater than 0');
         require(_baseToken.balanceOf(msg.sender) >= amount, 'Not enough tokens in the wallet');
+        require(lockPeriod >= _minLockDays && lockPeriod <= _maxLockDays, 'Invalid lock period');
 
         // add up total staked tokens
         _totalStaked = _totalStaked.add(amount);
@@ -110,6 +113,9 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
         // subtract total staked tokens
         _totalStaked = _totalStaked.sub(amount);
+
+        // reset lock period
+        _lockPeriods[msg.sender] = 0;
 
         // subtract amount from staked balances
         _stakedBalances[msg.sender] = _stakedBalances[msg.sender].sub(amount);

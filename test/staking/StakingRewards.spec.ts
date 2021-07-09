@@ -1,4 +1,4 @@
-import { ethers, deployments } from 'hardhat'
+import { ethers, waffle, deployments } from 'hardhat'
 import { expect } from 'chai'
 
 const { expectRevert } = require('@openzeppelin/test-helpers')
@@ -10,6 +10,8 @@ describe('StakingRewards', function () {
     this.address1 = address1
     this.address2 = address2
     this.totalRewardSupply = 150000000
+    this.minLockDays = 2
+    this.maxLockDays = 360
   })
 
   beforeEach(async function () {
@@ -33,21 +35,21 @@ describe('StakingRewards', function () {
   
     it('should not allow enter if not enough approve', async function () {
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(100, 0),
+        this.stakingContract.connect(this.address1).stake(100, this.minLockDays),
         'ERC20: transfer amount exceeds allowance'
       )
   
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 50);
   
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(100, 0),
+        this.stakingContract.connect(this.address1).stake(100, this.minLockDays),
         'ERC20: transfer amount exceeds allowance'
       )
     })
   
     it('should allow enter if enough approve', async function () {
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 100)
-      this.stakingContract.connect(this.address1).stake(100, 0)
+      this.stakingContract.connect(this.address1).stake(100, this.minLockDays)
   
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(900)
       expect(await this.paycer.balanceOf(this.stakingContract.address)).to.equal(100)
@@ -57,26 +59,46 @@ describe('StakingRewards', function () {
       const address1 = await this.paycer.connect(this.address1)
       await address1.approve(this.stakingContract.address, 100)
   
-      await expect(this.stakingContract.connect(this.address1).stake(0, 0)).to.be.revertedWith('Amount must be greater than 0')
-      await expect(this.stakingContract.connect(this.address1).stake(10000, 0)).to.be.revertedWith('Not enough tokens in the wallet')
+      await expect(this.stakingContract.connect(this.address1).stake(0, this.minLockDays)).to.be.revertedWith('Amount must be greater than 0')
+      await expect(this.stakingContract.connect(this.address1).stake(10000, this.minLockDays)).to.be.revertedWith('Not enough tokens in the wallet')
+    })
+
+    it('should not allow staking with invalid lock period', async function () {
+      const address1 = await this.paycer.connect(this.address1)
+      await address1.approve(this.stakingContract.address, 1000)
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).stake(100, 0),
+        'Invalid lock period'
+      )
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).stake(100, 1),
+        'Invalid lock period'
+      )
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).stake(100, 9999),
+        'Invalid lock period'
+      )
     })
   
     it('should allow staking with valid token amount', async function () {
       const address1 = await this.paycer.connect(this.address1)
       await address1.approve(this.stakingContract.address, 200)
   
-      await this.stakingContract.connect(this.address1).stake(100, 0)
+      await this.stakingContract.connect(this.address1).stake(100, this.minLockDays)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(900)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(100)
   
-      await this.stakingContract.connect(this.address1).stake(100, 0)
+      await this.stakingContract.connect(this.address1).stake(100, this.minLockDays)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(800)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(200)
   
       expect(await this.stakingContract.totalStakedBalances()).to.equal(200)
   
       await expectRevert(
-        this.stakingContract.connect(this.address1).stake(1000, 0),
+        this.stakingContract.connect(this.address1).stake(1000, this.minLockDays),
         'Not enough tokens in the wallet'
       )
     })
@@ -102,7 +124,6 @@ describe('StakingRewards', function () {
     it('should not allow if lock period not exceeded', async function () {
       const address1 = await this.paycer.connect(this.address1)
       await address1.approve(this.stakingContract.address, 200)
-  
       await this.stakingContract.connect(this.address1).stake(100, 14)
 
       await expectRevert(
@@ -110,29 +131,55 @@ describe('StakingRewards', function () {
         'Lock period not exceeded'
       )
 
-      await this.stakingContract.connect(this.address1).stake(25, 1)
+      await this.stakingContract.connect(this.address1).stake(25, 3)
 
       await expectRevert(
         this.stakingContract.connect(this.address1).withdraw(100),
         'Lock period not exceeded'
       )
 
-      await this.stakingContract.connect(this.address1).stake(25, 0)
+      await this.stakingContract.connect(this.address1).stake(25, 5)
+
+      await expectRevert(
+        this.stakingContract.connect(this.address1).withdraw(100),
+        'Lock period not exceeded'
+      ) 
+    })
+
+    it('should allow if lock period exceeded', async function() {
+      const address1 = await this.paycer.connect(this.address1)
+      await address1.approve(this.stakingContract.address, 1000)
+      await this.stakingContract.connect(this.address1).stake(100, 14)
 
       await expectRevert(
         this.stakingContract.connect(this.address1).withdraw(100),
         'Lock period not exceeded'
       )
-      
+
+      var now = new Date();
+      now.setDate(now.getDate() + 14);
+
+      await ethers.provider.send('evm_setNextBlockTimestamp', [now.getTime()]); 
+      await ethers.provider.send('evm_mine', [now.getTime()]);
+      await this.stakingContract.connect(this.address1).withdraw(100)
+      expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(0)
+
+
+      //
     })
 
     it('should allow withdraw', async function () {
       await this.paycer.connect(this.address1).approve(this.stakingContract.address, 200)
 
-      await this.stakingContract.connect(this.address1).stake(200, 0)
+      await this.stakingContract.connect(this.address1).stake(200, this.minLockDays)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(800)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(200)
       expect(await this.stakingContract.totalStakedBalances()).to.equal(200)
+
+      var now = new Date();
+      now.setDate(now.getDate() + this.minLockDays);
+      await ethers.provider.send('evm_setNextBlockTimestamp', [now.getTime()]); 
+      await ethers.provider.send('evm_mine', [now.getTime()]);
 
       await this.stakingContract.connect(this.address1).withdraw(100)
       expect(await this.paycer.balanceOf(this.address1.address)).to.equal(900)
