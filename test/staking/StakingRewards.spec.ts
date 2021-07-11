@@ -15,7 +15,7 @@ describe('StakingRewards', function () {
   })
 
   beforeEach(async function () {
-    await deployments.fixture(['PaycerToken', 'StakingRewards', 'RewardTreasury'])
+    await deployments.fixture(['PaycerToken', 'StakingRewards', 'RewardTreasury', 'PortfolioRegistry'])
 
     this.stakingContract = await ethers.getContract('StakingRewards', this.owner)
     this.rewardTreasury = await ethers.getContract('RewardTreasury', this.owner)
@@ -163,9 +163,6 @@ describe('StakingRewards', function () {
       await ethers.provider.send('evm_mine', [now.getTime()]);
       await this.stakingContract.connect(this.address1).withdraw(100)
       expect(await this.stakingContract.stakedBalanceOf(this.address1.address)).to.equal(0)
-
-
-      //
     })
 
     it('should allow withdraw', async function () {

@@ -8,6 +8,7 @@ import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/security/Pausable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '../interfaces/IRewardTreasury.sol';
+import '../interfaces/ILoyaltyProgram.sol';
 import 'hardhat/console.sol';
 
 
@@ -15,10 +16,13 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+
     /* ========== STATE VARIABLES ========== */
 
     IERC20 private _baseToken;
     IRewardTreasury private _rewardTreasury;
+    ILoyaltyProgram private _loyaltyProgram;
+
     uint256 private _totalStaked;
     uint256 private _minLockDays = 2;
     uint256 private _maxLockDays = 365;
@@ -40,9 +44,10 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address baseToken, address rewardTreasury) {
+    constructor(address baseToken, address rewardTreasury, address loyaltyProgram) {
         _baseToken = IERC20(baseToken);
         _rewardTreasury = IRewardTreasury(rewardTreasury);
+        _loyaltyProgram = ILoyaltyProgram(loyaltyProgram);
     }
 
 
@@ -70,7 +75,22 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
    
     function rewardBalanceOf(address account) public view virtual returns (uint256)  {
-        return _rewardBalances[account];
+        uint256 rewardRate = _loyaltyProgram.rewardRateOf(account);
+        uint256 stakedBalance = stakedBalanceOf(account);
+
+        uint256 lastTime = _lastClaimTimes[account] > 0 ? _lastClaimTimes[account] : _lastStakeTimes[account];
+        uint256 timeDiff = block.timestamp - lastTime;
+        uint256 rewardBalance = stakedBalance * (rewardRate /100 ) * timeDiff / 1;
+        
+
+        console.log('############# timestamp ###########', block.timestamp);
+        console.log('############# lastTime ###########', lastTime);
+        console.log('############# timeDiff ###########', timeDiff);
+        console.log('############# rewardBalance ###########', rewardBalance);
+        console.log('############# stakedBalance ###########', stakedBalance);
+        console.log('############# rewardRate ###########', (rewardRate /100 ));
+
+        return rewardBalance;
     }
 
 
@@ -103,11 +123,9 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
         require(amount > 0, 'Amount must be greater than 0');
         require(stakedBalanceOf(msg.sender) >= amount, 'Amount must be greater or equal to staked amount');
 
-
         if (_lockPeriods[msg.sender] > 0) {
             uint256 lastStakeTime = _lastStakeTimes[msg.sender];
             uint256 releaseTime = lastStakeTime + _lockPeriods[msg.sender] * 1 days;
-
             require(block.timestamp >= releaseTime, 'Lock period not exceeded');
         }
 
@@ -131,7 +149,6 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
         emit Withdrawn(msg.sender, amount);
     }
-
 
     function claim() external nonReentrant whenNotPaused calculateReward(msg.sender) {
         uint256 rewardAmount = _rewardBalances[msg.sender];
