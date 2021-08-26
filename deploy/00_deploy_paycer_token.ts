@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { owner } = await getNamedAccounts();
 
-  const totalSupply = 750000000
+  const totalSupply   = 750000000
 
   await deploy('PaycerToken', {
     from: owner,

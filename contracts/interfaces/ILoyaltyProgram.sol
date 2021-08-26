@@ -6,7 +6,7 @@ interface ILoyaltyProgram {
 
     function loyaltyTierOf(address account) external view returns (LoyaltyTier);
 
-    function rewardRateOf(address account) external view returns (uint256);
+    function baseRewardRateOf(address account) external view returns (uint256);
 
     function interestRateOf(address account) external view returns (uint256);
 

@@ -56,7 +56,7 @@ describe('PaycerToken', function () {
   
   it('should not allow owner to mint more tokens if supply is exceeded', async function () {
     const owner = await this.paycer.connect(this.owner)
-    await expect(owner.mint(owner.address, 800000000)).to.be.revertedWith('revert ERC20Capped: cap exceeded')
+    await expect(owner.mint(owner.address, 800000000)).to.be.revertedWith('ERC20Capped: cap exceeded')
   })
 
   it('Should transfer tokens between accounts', async function () {

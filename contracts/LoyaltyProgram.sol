@@ -50,11 +50,10 @@ contract LoyaltyProgram is ILoyaltyProgram {
         return LoyaltyTier.NONE;
     }
 
-
-
-    function rewardRateOf(address account) external override view returns (uint256) {
+    function baseRewardRateOf(address account) external override view returns (uint256) {
         return 15;
     }
+
 
     function interestRateOf(address account) external override view returns (uint256) {
         LoyaltyTier tier = _loyaltyTierOf(account);

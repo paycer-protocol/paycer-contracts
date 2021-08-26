@@ -25,11 +25,9 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     uint256 private _totalStaked;
     uint256 private _minLockDays = 2;
-    uint256 private _maxLockDays = 365;
 
     mapping(address => uint256) private _stakedBalances;
     mapping(address => uint256) private _rewardBalances;
-    mapping(address => uint256) private _lockPeriods;
     mapping(address => uint256) private _lastStakeTimes;
     mapping(address => uint256) private _lastWithdrawTimes;
     mapping(address => uint256) private _lastClaimTimes;
@@ -37,7 +35,7 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     /* ========== EVENTS ========== */
 
-    event Staked(address indexed account, uint256 amount, uint256 lockPeriod);
+    event Staked(address indexed account, uint256 amount);
     event Withdrawn(address indexed account, uint256 amount);
     event Claimed(address indexed account, uint256 amount);
 
@@ -65,30 +63,44 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
         return _stakedBalances[account];
     }
 
+    function lastClaimedOf(address account) public view virtual returns (uint256) {
+        return 10;
+    }
+
+    function totalClaimedOf(address account) public view virtual returns (uint256) {
+        return 1000;
+    }
+
     function lastStakeTimeOf(address account) public view virtual returns (uint256) {
         return _lastStakeTimes[account];
     }
 
-    function lastWithdrawTime(address account) public view virtual returns (uint256) {
+    function lastWithdrawTimeOf(address account) public view virtual returns (uint256) {
         return _lastWithdrawTimes[account];
     }
 
+    function rewardRateOf(address account) public view virtual returns (uint256) {
+        return  15;
+    }
    
     function rewardBalanceOf(address account) public view virtual returns (uint256)  {
-        uint256 rewardRate = _loyaltyProgram.rewardRateOf(account);
+        uint256 rewardRate = _loyaltyProgram.baseRewardRateOf(account);
         uint256 stakedBalance = stakedBalanceOf(account);
 
-        uint256 lastTime = _lastClaimTimes[account] > 0 ? _lastClaimTimes[account] : _lastStakeTimes[account];
-        uint256 timeDiff = block.timestamp - lastTime;
-        uint256 rewardBalance = stakedBalance * (rewardRate /100 ) * timeDiff / 1;
-        
+        uint256 lastClaimOrStakeTime = _lastClaimTimes[account] > 0 
+            ? _lastClaimTimes[account] 
+            : _lastStakeTimes[account];
+        if (lastClaimOrStakeTime == 0) {
+            return 0;
+        }
 
-        console.log('############# timestamp ###########', block.timestamp);
-        console.log('############# lastTime ###########', lastTime);
-        console.log('############# timeDiff ###########', timeDiff);
-        console.log('############# rewardBalance ###########', rewardBalance);
-        console.log('############# stakedBalance ###########', stakedBalance);
-        console.log('############# rewardRate ###########', (rewardRate /100 ));
+        uint256 stakedHours = block.timestamp.sub(lastClaimOrStakeTime).div(365 days);
+        if (stakedHours == 0) {
+            return 0;
+        }
+
+        uint256 ratePerHour = rewardRate.mul(100000).div(365 days);
+        uint256 rewardBalance = stakedHours * (stakedBalance * ratePerHour / 100);
 
         return rewardBalance;
     }
@@ -96,72 +108,49 @@ contract StakingRewards is ReentrancyGuard, Pausable, Ownable {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     
-    function stake(uint256 amount, uint256 lockPeriod) external nonReentrant whenNotPaused calculateReward(msg.sender) {
+    function stake(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, 'Amount must be greater than 0');
         require(_baseToken.balanceOf(msg.sender) >= amount, 'Not enough tokens in the wallet');
-        require(lockPeriod >= _minLockDays && lockPeriod <= _maxLockDays, 'Invalid lock period');
 
-        // add up total staked tokens
         _totalStaked = _totalStaked.add(amount);
 
-        // add account to staked balances
         _stakedBalances[msg.sender] = _stakedBalances[msg.sender].add(amount);
 
-        // add lock period in days
-        _lockPeriods[msg.sender] = _lockPeriods[msg.sender].add(lockPeriod);
-
-        // lock tokens in the contract
         _baseToken.safeTransferFrom(msg.sender, address(this), amount);
 
-        // add timestamp to account
         _lastStakeTimes[msg.sender] = block.timestamp;
 
-        emit Staked(msg.sender, amount, lockPeriod);
+        emit Staked(msg.sender, amount);
     }
 
-    function withdraw(uint256 amount) external nonReentrant whenNotPaused calculateReward(msg.sender) {
+    function withdraw(uint256 amount) external nonReentrant whenNotPaused {
         require(amount > 0, 'Amount must be greater than 0');
+        require(_minLockDays > 0, 'Amount must be greater than 0');
         require(stakedBalanceOf(msg.sender) >= amount, 'Amount must be greater or equal to staked amount');
 
-        if (_lockPeriods[msg.sender] > 0) {
-            uint256 lastStakeTime = _lastStakeTimes[msg.sender];
-            uint256 releaseTime = lastStakeTime + _lockPeriods[msg.sender] * 1 days;
-            require(block.timestamp >= releaseTime, 'Lock period not exceeded');
-        }
-
-        // subtract total staked tokens
         _totalStaked = _totalStaked.sub(amount);
 
-        // reset lock period
-        _lockPeriods[msg.sender] = 0;
-
-        // subtract amount from staked balances
         _stakedBalances[msg.sender] = _stakedBalances[msg.sender].sub(amount);
 
-        // approve transfer amount to perform transfer
         _baseToken.approve(address(this), amount);
 
-        // release tokens from the contract
         _baseToken.safeTransferFrom(address(this), msg.sender, amount);
 
-        // add timestamp to account
         _lastWithdrawTimes[msg.sender] = block.timestamp;
 
         emit Withdrawn(msg.sender, amount);
     }
 
+    // TODO: jeden tag nur einmal claimen ermöglichen
     function claim() external nonReentrant whenNotPaused calculateReward(msg.sender) {
         uint256 rewardAmount = _rewardBalances[msg.sender];
         require(rewardAmount > 0, 'Amount must be greater than 0');
         require(treasurySupply() >= rewardAmount, 'Not enough tokens in the treasury');
 
-        // reset reward from reward balances
         _rewardBalances[msg.sender] = 0;
 
-        // transfer tokens from reward treasury to beneficial
         _rewardTreasury.claim(msg.sender, rewardAmount);
 
-        // add timestamp to account
         _lastClaimTimes[msg.sender] = block.timestamp;
 
         emit Claimed(msg.sender, rewardAmount);
