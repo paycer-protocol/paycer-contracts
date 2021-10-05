@@ -15,7 +15,7 @@ describe('VLINK Pool', function () {
     this.accounts = await ethers.getSigners()
     vDaiPoolObj.accounts = this.accounts
     await setupVPool(vDaiPoolObj, {
-      pool: 'VDAI',
+      pool: 'pDAI',
       strategy: 'AaveV2StrategyDAI',
       strategyType: 'aaveV2',
       feeCollector: this.accounts[9],

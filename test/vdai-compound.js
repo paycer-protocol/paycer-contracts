@@ -8,7 +8,7 @@ describe('vDAI Pool with Compound strategy', function () {
   beforeEach(async function () {
     this.accounts = await ethers.getSigners()
     await setupVPool(this, {
-      pool: 'VDAI',
+      pool: 'pDAI',
       strategy: 'CompoundStrategyDAI',
       feeCollector: this.accounts[9],
       strategyType: 'compound',

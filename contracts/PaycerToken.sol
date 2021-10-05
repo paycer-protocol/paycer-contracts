@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.6.12;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20Capped.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract PaycerToken is ERC20Capped, Ownable {
@@ -13,7 +13,7 @@ contract PaycerToken is ERC20Capped, Ownable {
      * All two of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(uint256 _initialSupply, uint256 _totalSupply) ERC20('PaycerToken', 'PCR') ERC20Capped(_totalSupply) {
+    constructor(uint256 _initialSupply, uint256 _totalSupply) public ERC20('PaycerToken', 'PCR') ERC20Capped(_totalSupply) {
         ERC20._mint(msg.sender, _initialSupply);
     }
 

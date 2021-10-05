@@ -13,7 +13,7 @@ describe('vDAI Pool with VesperV3Strategy', function () {
 
     await setupVPool(this, {
       controller: 'Controller',
-      pool: 'VDAI',
+      pool: 'pDAI',
       strategy: 'VesperV3StrategyDAI',
       feeCollector: this.accounts[9],
       strategyType: 'vesperv3',

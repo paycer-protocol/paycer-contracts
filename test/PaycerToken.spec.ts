@@ -1,7 +1,7 @@
 import { ethers, deployments } from 'hardhat'
 import { expect } from 'chai'
 
-describe('PaycerToken', function () {
+/*describe('PaycerToken', function () {
   before(async function () {
     this.signers = await ethers.getSigners()
     this.owner = this.signers[0]
@@ -77,4 +77,4 @@ describe('PaycerToken', function () {
     await expect(owner.transfer(this.address1.address, 10000000)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     await expect(address2.transfer(this.owner.address, 1)).to.be.revertedWith('ERC20: transfer amount exceeds balance')
   })
-})
+})*/

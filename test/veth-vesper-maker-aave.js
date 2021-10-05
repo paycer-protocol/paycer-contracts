@@ -15,7 +15,7 @@ describe('VETH Pool', function () {
     vDaiPoolObj.accounts = this.accounts
     ;[, user1] = this.accounts
     await setupVPool(vDaiPoolObj, {
-      pool: 'VDAI',
+      pool: 'pDAI',
       strategy: 'AaveV2StrategyDAI',
       strategyType: 'aaveV2',
       feeCollector: this.accounts[9],

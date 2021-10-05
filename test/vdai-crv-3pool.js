@@ -44,7 +44,7 @@ describe('vDAI Pool with Crv3PoolStrategy', function () {
     this.accounts = await ethers.getSigners()
     ;[user1, user2, user3, user4, user5, user6, user7, user8] = this.accounts    
     await setupVPool(this, {
-      pool: 'VDAI',
+      pool: 'pDAI',
       strategy: 'Crv3PoolStrategyDAI',
       feeCollector: this.accounts[9],
       strategyType: 'crv',
@@ -276,7 +276,7 @@ describe('vDAI Pool with Crv3PoolStrategy', function () {
       console.log(userBal.toString())
       const vSupply = await pool.totalSupply()
       console.log(vSupply.toString())
-      console.log(`VDAI CRV 3POOL is operating at roughly ${readablePI}% APY`)
+      console.log(`pDAI CRV 3POOL is operating at roughly ${readablePI}% APY`)
       console.log(`avg gas used by rebalance: ${gasUsed.div(BN.from(30))}`)
     })
   })
