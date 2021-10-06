@@ -52,8 +52,8 @@ describe('VVSP Pool', function () {
     await controller.executeTransaction(target, 0, methodSignature, data)
   }
 
-  async function setupVWBTC() {
-    vwbtc = await deployContract('VWBTC', [controller.address])
+  async function setupPWBTC() {
+    vwbtc = await deployContract('PWBTC', [controller.address])
     await controller.addPool(vwbtc.address)
     asWBTC = await deployContract('AaveV2StrategyWBTC', [controller.address, vwbtc.address])
     await Promise.all([
@@ -96,7 +96,7 @@ describe('VVSP Pool', function () {
     accounts = await ethers.getSigners()
     ;[owner, user1] = accounts
     vvsp = await deployContract('VVSP', [controller.address, vsp.address])
-    veth = await deployContract('VETH', [controller.address])
+    veth = await deployContract('PETH', [controller.address])
     weth = await ethers.getContractAt('TokenLike', WETH)
     auctionMgr = await deployContract('DescendingPriceAuction')
     await controller.addPool(veth.address)
@@ -309,8 +309,8 @@ describe('VVSP Pool', function () {
       await vs.connect(owner).rebalance()
     })
 
-    it('Should be able to liquidate vWBTC', async function () {
-      await setupVWBTC()
+    it('Should be able to liquidate pWBTC', async function () {
+      await setupPWBTC()
       await swapper.swapEthForToken(10, wbtcAddress, owner)
       const wbtc = await ethers.getContractAt('TokenLike', wbtcAddress)
       const wbtcBalance = await wbtc.balanceOf(owner.address)
@@ -414,9 +414,9 @@ describe('VVSP Pool', function () {
       expect(auctionId.sub(totalAuctions)).to.be.equal('1', 'Auction 3 was not created properly')
     })
 
-    it('Should be able to liquidate vWBTC and vETH in order', async function () {
-      // Setup and liquidate vWBTC
-      await setupVWBTC()
+    it('Should be able to liquidate pWBTC and pETH in order', async function () {
+      // Setup and liquidate pWBTC
+      await setupPWBTC()
       await swapper.swapEthForToken(10, wbtcAddress, owner)
 
       const wbtc = await ethers.getContractAt('TokenLike', wbtcAddress)
@@ -432,7 +432,7 @@ describe('VVSP Pool', function () {
       const auctionId = await auctionMgr.totalAuctions()
       expect(auctionId.sub(totalAuctions)).to.be.equal('1', 'Auction was not created properly')
 
-      // Liduidate vETH
+      // Liduidate pETH
       const amount = '20000000000000000000'
       await veth.connect(owner)['deposit()']({value: amount.toString()})
       await as.rebalance()
@@ -452,7 +452,7 @@ describe('VVSP Pool', function () {
       await vs.connect(owner).rebalance()
 
       const totalSupply = (await veth.totalSupply()).toString()
-      expect(totalSupply).to.be.eq('0', 'VETH total supply is wrong')
+      expect(totalSupply).to.be.eq('0', 'PETH total supply is wrong')
     })
 
     it('Should continue to liquidate even if pool count is decreased', async function () {

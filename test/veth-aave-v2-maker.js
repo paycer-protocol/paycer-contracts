@@ -13,14 +13,14 @@ const {BigNumber: BN} = require('ethers')
 
 const DECIMAL = BN.from('1000000000000000000')
 /* eslint-disable mocha/max-top-level-suites */
-describe('VETH Pool with AaveMakerStrategy V2', function () {
+describe('PETH Pool with AaveMakerStrategy V2', function () {
   let pool, controller, strategy, collateralToken
   let user1, user2, user3, user4
   beforeEach(async function () {
     this.accounts = await ethers.getSigners()
     ;[, user1, user2, user3, user4] = this.accounts
     await setupVPool(this, {
-      pool: 'VETH',
+      pool: 'PETH',
       strategy: 'AaveV2MakerStrategyETH',
       collateralManager: 'CollateralManager',
       feeCollector: this.accounts[9],
@@ -33,9 +33,9 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
     collateralToken = this.collateralToken
   })
 
-  shouldBehaveLikePool('vETH', 'WETH', 'aDAI')
+  shouldBehaveLikePool('pETH', 'WETH', 'aDAI')
 
-  shouldBehaveLikeStrategy('vETH', 'WETH', 'aDAI')
+  shouldBehaveLikeStrategy('pETH', 'WETH', 'aDAI')
 
   describe('Basic test with ETH as collateral', function() {
     it('Should deposit and rebalance', async function () {
@@ -49,9 +49,9 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
           pool.balanceOf(user1.address),
         ]).then(function ([tokenLocked, totalSupply, totalValue, vPoolBalance]) {
           expect(tokenLocked).to.be.equal(depositAmount, 'ETH locked is wrong')
-          expect(totalSupply).to.be.equal(depositAmount, 'Total supply of vETH is wrong')
-          expect(totalValue).to.be.equal(depositAmount, 'Total value of $ vETH is wrong')
-          expect(vPoolBalance).to.be.equal(depositAmount, 'vETH balance of user is wrong')
+          expect(totalSupply).to.be.equal(depositAmount, 'Total supply of pETH is wrong')
+          expect(totalValue).to.be.equal(depositAmount, 'Total value of $ pETH is wrong')
+          expect(vPoolBalance).to.be.equal(depositAmount, 'pETH balance of user is wrong')
           
         })
     })
@@ -67,9 +67,9 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
           pool.balanceOf(user2.address),
         ]).then(function ([tokenLocked, totalSupply, totalValue, vPoolBalance]) {
           expect(tokenLocked).to.be.equal(depositAmount.toString(), 'ETH locked is wrong')
-          expect(totalSupply).to.be.equal(depositAmount.toString(), 'Total supply of vETH is wrong')
-          expect(totalValue).to.be.equal(depositAmount.toString(), 'Total value of $ vETH is wrong')
-          expect(vPoolBalance).to.be.equal(depositAmount.toString(), 'vETH balance of user is wrong')
+          expect(totalSupply).to.be.equal(depositAmount.toString(), 'Total supply of pETH is wrong')
+          expect(totalValue).to.be.equal(depositAmount.toString(), 'Total value of $ pETH is wrong')
+          expect(vPoolBalance).to.be.equal(depositAmount.toString(), 'pETH balance of user is wrong')
           
         })
     })
@@ -89,9 +89,9 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
         provider.getBalance(user3.address),
       ]).then(function ([tokenLocked, totalSupply, totalValue, vPoolBalance, ethBalanceAfter]) {
         expect(tokenLocked).to.be.equal('0', 'ETH locked is wrong')
-        expect(totalSupply).to.be.equal('0', 'Total supply of vETH is wrong')
-        expect(totalValue).to.be.equal('0', 'Total value of vETH is wrong')
-        expect(vPoolBalance).to.be.equal('0', 'vETH balance of user is wrong')
+        expect(totalSupply).to.be.equal('0', 'Total supply of pETH is wrong')
+        expect(totalValue).to.be.equal('0', 'Total value of pETH is wrong')
+        expect(vPoolBalance).to.be.equal('0', 'pETH balance of user is wrong')
         expect(ethBalanceAfter).to.be.gt(ethBalanceBefore, 'ETH balance of user is wrong')
       })
     })
@@ -134,7 +134,7 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
       await pool.connect(user4).withdraw(withdrawAmount)
 
       const balance = await pool.balanceOf(this.feeCollector.address)
-      expect(balance).to.be.equal(expectedVPoolToken, 'vETH balance of FC is wrong')
+      expect(balance).to.be.equal(expectedVPoolToken, 'pETH balance of FC is wrong')
 
       await pool.connect(this.feeCollector).withdraw(balance)
 
@@ -142,9 +142,9 @@ describe('VETH Pool with AaveMakerStrategy V2', function () {
         pool.balanceOf(user1.address)]).then(
         function ([tokenLocked, totalSupply, totalValue, vPoolBalance]) {
           expect(tokenLocked).to.be.equal('0', 'WETH locked is wrong')
-          expect(totalSupply).to.be.equal('0', 'Total supply of vETH is wrong')
-          expect(totalValue).to.be.equal('0', 'Total value of vETH is wrong')
-          expect(vPoolBalance).to.be.equal('0', 'vETH balance of user is wrong')
+          expect(totalSupply).to.be.equal('0', 'Total supply of pETH is wrong')
+          expect(totalValue).to.be.equal('0', 'Total value of pETH is wrong')
+          expect(vPoolBalance).to.be.equal('0', 'pETH balance of user is wrong')
         }
       )
     })

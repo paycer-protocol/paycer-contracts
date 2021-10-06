@@ -179,7 +179,7 @@ contract VSPAuctionStrategy is Pausable {
     }
 
     function _createAuction(IVesperPool _poolToken, uint256 _poolTokenAmount) internal {
-        // unwrap poolTokens to Tokens ie vWBTC -> WBTC
+        // unwrap poolTokens to Tokens ie pWBTC -> WBTC
         _poolToken.withdrawByStrategy(_poolTokenAmount);
         address[] memory _tokens = new address[](1);
         _tokens[0] = _poolToken.token();

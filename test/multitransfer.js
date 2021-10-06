@@ -7,7 +7,7 @@ const DECIMAL = BN.from('1000000000000000000')
 let veth, controller, accounts
 async function setupVPool() {
   controller = await deployContract('Controller')
-  veth = await deployContract('VETH', [controller.address])
+  veth = await deployContract('PETH', [controller.address])
   await controller.addPool(veth.address)
   const strategy = await deployContract('AaveV2StrategyWBTC',[controller.address, veth.address])
   await controller.updateStrategy(veth.address, strategy.address)

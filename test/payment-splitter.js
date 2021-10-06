@@ -21,7 +21,7 @@ describe('PaymentSplitter', function () {
       beforeEach(async function () {
         ;[payee1, payee2, payee3, payer1, nonpayee1, user6] = await ethers.getSigners()
         const controller = await deployContract('Controller')
-        veth = await deployContract('VETH', [controller.address])
+        veth = await deployContract('PETH', [controller.address])
       })
 
       it('rejects an empty set of payees', async function () {
@@ -65,7 +65,7 @@ describe('PaymentSplitter', function () {
         payees = [payee1.address, payee2.address]
         shares = [5, 95]
         const controller = await deployContract('Controller')
-        const veth = await deployContract('VETH', [controller.address])
+        const veth = await deployContract('PETH', [controller.address])
         psContract = await deployContract('PaymentSplitter', [payees, shares, veth.address])
         asset1 = await deployContract('VSP')
       })
@@ -124,7 +124,7 @@ describe('PaymentSplitter', function () {
         payees = [payee1.address, payee2.address]
         shares = [5, 95]
         const controller = await deployContract('Controller')
-        const veth = await deployContract('VETH', [controller.address])
+        const veth = await deployContract('PETH', [controller.address])
         psContract = await deployContract('PaymentSplitter', [payees, shares, veth.address])
       })
 
@@ -191,7 +191,7 @@ describe('PaymentSplitter', function () {
           payees = [payee1.address, payee2.address]
           shares = [5, 95]
           const controller = await deployContract('Controller')
-          const veth = await deployContract('VETH', [controller.address])
+          const veth = await deployContract('PETH', [controller.address])
           psContract = await deployContract('PaymentSplitter', [payees, shares, veth.address])
           await asset1.mint(psContract.address, mintAmount)
         })
@@ -332,7 +332,7 @@ describe('PaymentSplitter', function () {
           payees = [payee1.address, payee3.address, payee2.address]
           shares = [20, 30, 950]
           const controller = await deployContract('Controller')
-          const veth = await deployContract('VETH', [controller.address])
+          const veth = await deployContract('PETH', [controller.address])
           psContract = await deployContract('PaymentSplitter', [payees, shares, veth.address])
           const mintAmount = BN.from(amount).toString()
           await asset1.mint(psContract.address, mintAmount)
@@ -371,7 +371,7 @@ describe('PaymentSplitter', function () {
         payees = [payee1.address, payee2.address]
         shares = [5, 95]
         const controller = await deployContract('Controller')
-        const veth = await deployContract('VETH', [controller.address])
+        const veth = await deployContract('PETH', [controller.address])
         psContract = await deployContract('PaymentSplitter', [payees, shares, veth.address])
         await asset1.mint(psContract.address, mintAmount)
         await asset2.mint(psContract.address, asset2MintAmount)
@@ -537,7 +537,7 @@ describe('PaymentSplitter', function () {
         payees = [payee1.address, payee2.address]
         shares = [5, 95]
         const controller = await deployContract('Controller')
-        veth = await deployContract('VETH', [controller.address])
+        veth = await deployContract('PETH', [controller.address])
         await controller.addPool(veth.address)
         const strategy = await deployContract('AaveV2StrategyWBTC', [controller.address, veth.address])
         await controller.updateStrategy(veth.address, strategy.address)
@@ -559,7 +559,7 @@ describe('PaymentSplitter', function () {
         await send(signer.address, user6.address, ethBalance)
         await send(user6.address, VESPER_DEPLOYER, BN.from('10').mul(DECIMAL))
 
-        // Transfer some VETH at payment splitter contract address to bring VESPER_DEPLOYER balance < low level
+        // Transfer some PETH at payment splitter contract address to bring VESPER_DEPLOYER balance < low level
         await veth.connect(signer)['deposit()']({value:BN.from('8').mul(DECIMAL).toString()})
         const vethAmount = BN.from('6').mul(DECIMAL)
         await veth.connect(signer).transfer(psContract.address, vethAmount.toString())
@@ -568,7 +568,7 @@ describe('PaymentSplitter', function () {
         const ethBalanceBefore = await provider.getBalance(VESPER_DEPLOYER)
         expect(ethBalanceBefore).to.be.lt(BN.from(low), 'eth balance is above low value')
 
-        // Check VETH at payment splitter contract address
+        // Check PETH at payment splitter contract address
         const psVethBalanceBefore = await veth.balanceOf(psContract.address)
         expect(psVethBalanceBefore).to.be.equal(BN.from(vethAmount), 'wrong veth amount')
 
@@ -591,7 +591,7 @@ describe('PaymentSplitter', function () {
         await send(user6.address, VESPER_DEPLOYER, BN.from('15').mul(DECIMAL))
         await send(user6.address, VESPER_DEPLOYER, BN.from('10').mul(DECIMAL))
         
-        // Transfer some VETH at payment splitter contract address to bring VESPER_DEPLOYER balance < low level
+        // Transfer some PETH at payment splitter contract address to bring VESPER_DEPLOYER balance < low level
         await veth.connect(signer)['deposit()']({value: BN.from('23').mul(DECIMAL).toString()})
         const vethAmount = BN.from('22').mul(DECIMAL) // high level is 20 so transfer > 20
         await veth.connect(signer).transfer(psContract.address, vethAmount.toString())
@@ -600,7 +600,7 @@ describe('PaymentSplitter', function () {
         const ethBalanceBefore = await provider.getBalance(VESPER_DEPLOYER)
         expect(ethBalanceBefore).to.be.lt(BN.from(low), 'eth balance is above low value')
 
-        // Check VETH at payment splitter contract address
+        // Check PETH at payment splitter contract address
         const psVethBalanceBefore = await veth.balanceOf(psContract.address)
         expect(psVethBalanceBefore).to.be.equal(BN.from(vethAmount), 'wrong veth amount')
 
@@ -630,7 +630,7 @@ describe('PaymentSplitter', function () {
         await send(user6.address, VESPER_DEPLOYER, BN.from('15').mul(DECIMAL))
         await send(user6.address, VESPER_DEPLOYER, BN.from('10').mul(DECIMAL))
 
-        // add some VETH at payment splitter contract address
+        // add some PETH at payment splitter contract address
         await veth.connect(signer)['deposit()']({value: BN.from('20').mul(DECIMAL).toString()})
         const vethAmount = BN.from('15').mul(DECIMAL)
         await veth.connect(signer).transfer(psContract.address, vethAmount.toString())

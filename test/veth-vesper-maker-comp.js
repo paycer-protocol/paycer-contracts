@@ -7,7 +7,7 @@ const {deposit} = require('./utils/poolOps')
 const {setupVPool} = require('./utils/setupHelper')
 const {expect} = require('chai')
 
-describe('VETH Pool', function () {
+describe('PETH Pool', function () {
   let vDai, dai, vEth, strategy, weth, user1
   const vDaiPoolObj = {}
 
@@ -26,7 +26,7 @@ describe('VETH Pool', function () {
     await deposit(vDai, dai, 200, user1)
     await vDai.rebalance()
     await setupVPool(this, {
-      pool: 'VETH',
+      pool: 'PETH',
       strategy: 'VesperMakerStrategyETH',
       collateralManager: 'CollateralManager',
       feeCollector: this.accounts[9],
@@ -42,9 +42,9 @@ describe('VETH Pool', function () {
     weth = this.collateralToken
   })
 
-  shouldBehaveLikePool('vETH', 'WETH', 'vDai')
+  shouldBehaveLikePool('pETH', 'WETH', 'vDai')
 
-  shouldBehaveLikeStrategy('vETH', 'WETH', 'vDai')
+  shouldBehaveLikeStrategy('pETH', 'WETH', 'vDai')
 
   it('Should not allow to sweep vToken from strategy', async function () {
     await deposit(vEth, weth, 10, user1)

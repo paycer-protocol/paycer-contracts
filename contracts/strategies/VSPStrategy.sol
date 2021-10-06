@@ -92,7 +92,7 @@ contract VSPStrategy is Pausable {
 
     /**
         withdraw Vtoken from vvsp => Deposit vpool => withdraw collateral => swap in uni for VSP => transfer vsp to vvsp pool
-        VETH => ETH => VSP
+        PETH => ETH => VSP
      */
     function rebalance() external whenNotPaused onlyKeeper {
         require(

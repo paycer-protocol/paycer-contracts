@@ -11,7 +11,7 @@ const {setupVPool} = require('./utils/setupHelper')
 const {BigNumber: BN} = require('ethers')
 const time = require('./utils/time')
 
-describe('vUSDC Pool with Crv3PoolStrategy', function () {
+describe('pUSDC Pool with Crv3PoolStrategy', function () {
   let pool, collateralToken, feeCollector, strategy
   let user1, user2, user3
 
@@ -19,7 +19,7 @@ describe('vUSDC Pool with Crv3PoolStrategy', function () {
     this.accounts = await ethers.getSigners()
     ;[, user1, user2, user3] = this.accounts
     await setupVPool(this, {
-      pool: 'VUSDC',
+      pool: 'PUSDC',
       strategy: 'Crv3PoolStrategyUSDC',
       feeCollector: this.accounts[9],
       strategyType: 'crv',
@@ -82,7 +82,7 @@ describe('vUSDC Pool with Crv3PoolStrategy', function () {
       console.log(userBal.toString())
       const vSupply = await pool.totalSupply()
       console.log(vSupply.toString())
-      console.log(`VUSDC CRV 3POOL is operating at roughly ${readablePI}% APY`)
+      console.log(`PUSDC CRV 3POOL is operating at roughly ${readablePI}% APY`)
       console.log(`avg gas used by rebalance: ${gasUsed.div(BN.from(30))}`)
     })
   })

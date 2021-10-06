@@ -5,13 +5,13 @@ pragma solidity 0.6.12;
 import "./PTokenBase.sol";
 import "../interfaces/token/IToken.sol";
 
-contract VETH is PTokenBase {
+contract PETH is PTokenBase {
     TokenLike public immutable weth;
     bool internal shouldDeposit = true;
 
     constructor(address _controller)
         public
-        PTokenBase("vETH Pool", "vETH", 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, _controller)
+        PTokenBase("pETH Pool", "pETH", 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, _controller)
     {
         weth = TokenLike(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     }

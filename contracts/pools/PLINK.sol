@@ -5,9 +5,9 @@ pragma solidity 0.6.12;
 import "./PTokenBase.sol";
 
 //solhint-disable no-empty-blocks
-contract VLINK is PTokenBase {
+contract PLINK is PTokenBase {
     constructor(address _controller)
         public
-        PTokenBase("vLINK Pool", "vLINK", 0x514910771AF9Ca656af840dff83E8264EcF986CA, _controller)
+        PTokenBase("pLINK Pool", "pLINK", 0x514910771AF9Ca656af840dff83E8264EcF986CA, _controller)
     {}
 }

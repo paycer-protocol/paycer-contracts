@@ -52,7 +52,7 @@ contract PaymentSplitter is Context {
      * duplicates in `payees`.
      * @param _payees -  address(es) of payees eligible to receive token(s)
      * @param _share - list of shares, transferred to payee in provided ratio.
-     * @param _veth - vETH address, used for vesper deployer top up
+     * @param _veth - pETH address, used for vesper deployer top up
      */
     constructor(
         address[] memory _payees,

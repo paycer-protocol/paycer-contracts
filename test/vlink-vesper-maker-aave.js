@@ -7,7 +7,7 @@ const {deposit} = require('./utils/poolOps')
 const {setupVPool} = require('./utils/setupHelper')
 const {expect} = require('chai')
 
-describe('VLINK Pool', function () {
+describe('PLINK Pool', function () {
   let vDai, dai, vLink, strategy, link
   const vDaiPoolObj = {}
 
@@ -25,7 +25,7 @@ describe('VLINK Pool', function () {
     await deposit(vDai, dai, 2, this.accounts[0])
     await vDai.rebalance()
     await setupVPool(this, {
-      pool: 'VLINK',
+      pool: 'PLINK',
       strategy: 'VesperMakerStrategyLINK',
       collateralManager: 'CollateralManager',
       feeCollector: this.accounts[9],
@@ -40,9 +40,9 @@ describe('VLINK Pool', function () {
     link = this.collateralToken
   })
 
-  shouldBehaveLikePool('vLINK', 'LINK', 'vLink')
+  shouldBehaveLikePool('pLINK', 'LINK', 'vLink')
 
-  shouldBehaveLikeStrategy('vLINK', 'LINK', 'vLink')
+  shouldBehaveLikeStrategy('pLINK', 'LINK', 'vLink')
 
   it('Should not allow to sweep vToken from pool and strategy', async function () {
     await deposit(vLink, link, 10, this.accounts[0])

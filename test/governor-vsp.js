@@ -59,7 +59,7 @@ describe('GovernorAlpha', function() {
     controller = await deployContract('Controller')
     governor = await deployContract('GovernorAlpha', [timelock.address, vsp.address, owner.address])
 
-    vwbtc = await deployContract('VWBTC', [controller.address])
+    vwbtc = await deployContract('PWBTC', [controller.address])
     await controller.addPool(vwbtc.address)
     strategy = await deployContract('AaveV2StrategyWBTC', [controller.address, vwbtc.address])
 

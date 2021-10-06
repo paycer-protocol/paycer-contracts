@@ -12,14 +12,14 @@ const {approveToken, createKeeperList, addInList} = require('./utils/setupHelper
 const DECIMAL = BN.from('1000000000000000000')
 const wethAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 const TOTAL_REWARD = BN.from(150000).mul(DECIMAL)
-describe('Reward in VETH Pool', function () {
+describe('Reward in PETH Pool', function () {
   let veth, strategy, controller, vsp, poolRewards, accounts
 
   async function setupVPool() {
     accounts = await ethers.getSigners()
     vsp = await deployContract('VSP')
     controller = await deployContract('Controller')
-    veth = await deployContract('VETH', [controller.address] )
+    veth = await deployContract('PETH', [controller.address] )
     await controller.addPool(veth.address)
     poolRewards = await deployContract('PoolRewards',[veth.address, vsp.address, controller.address])
     strategy = await deployContract('AaveV2StrategyETH',[controller.address, veth.address])
@@ -227,7 +227,7 @@ describe('Reward in VETH Pool', function () {
       claimable = await poolRewards.claimable(accounts[1].address)
       assert(claimable.gt(BN.from('0')), 'Claimable should be greater than 0')
 
-      // Withdraw vETH and claim reward for account 1
+      // Withdraw pETH and claim reward for account 1
       vethBalance = await veth.balanceOf(accounts[1].address)
       await veth.connect(accounts[1]).withdraw(vethBalance)
       await poolRewards.connect(accounts[1]).claimReward(accounts[1].address)
@@ -238,7 +238,7 @@ describe('Reward in VETH Pool', function () {
       let reward = await vsp.balanceOf(accounts[1].address)
       assert(reward.gt(BN.from('0')), 'Reward balance should be greater than 0')
 
-      // Withdraw vETH and claim reward for account 0
+      // Withdraw pETH and claim reward for account 0
       vethBalance = await veth.balanceOf(accounts[0].address)
       await veth.withdraw(vethBalance)
       await poolRewards.claimReward(accounts[0].address)

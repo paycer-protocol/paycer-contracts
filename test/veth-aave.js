@@ -5,11 +5,11 @@ const {shouldBehaveLikePool} = require('./behavior/vesper-pool')
 // const {shouldBehaveLikeStrategy} = require('./behavior/aave-strategy')
 const {setupVPool} = require('./utils/setupHelper')
 
-describe('vETH Pool with AaveStrategy', function () {
+describe('pETH Pool with AaveStrategy', function () {
   beforeEach(async function () {
     this.accounts = await ethers.getSigners()
     await setupVPool(this, {
-      pool: 'VETH',
+      pool: 'PETH',
       strategy: 'AaveV2StrategyETH',
       feeCollector: this.accounts[9],
       strategyType: 'aaveV2',
@@ -17,6 +17,6 @@ describe('vETH Pool with AaveStrategy', function () {
     this.newStrategy = 'AaveV2StrategyETH'
   })
 
-  shouldBehaveLikePool('vETH', 'WETH', 'aETH')
-  // shouldBehaveLikeStrategy('vETH', 'WETH', 'aETH')
+  shouldBehaveLikePool('pETH', 'WETH', 'aETH')
+  // shouldBehaveLikeStrategy('pETH', 'WETH', 'aETH')
 })

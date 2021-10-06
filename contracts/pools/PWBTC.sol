@@ -5,10 +5,10 @@ pragma solidity 0.6.12;
 import "./PTokenBase.sol";
 
 //solhint-disable no-empty-blocks
-contract VWBTC is PTokenBase {
+contract PWBTC is PTokenBase {
     constructor(address _controller)
         public
-        PTokenBase("vWBTC Pool", "vWBTC", 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, _controller)
+        PTokenBase("pWBTC Pool", "pWBTC", 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, _controller)
     {}
 
     /// @dev Convert to 18 decimals from token defined decimals.
