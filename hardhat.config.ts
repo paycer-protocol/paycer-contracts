@@ -17,32 +17,21 @@ const accounts = {
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
+    localhost: {
+      saveDeployments: true,
+    },
     hardhat: {
-      allowUnlimitedContractSize: false,
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`
-      }
+        url: process.env.NODE_URL || '',
+        blockNumber: process.env.BLOCK_NUMBER ? parseInt(process.env.BLOCK_NUMBER) : undefined,
+      },
+      saveDeployments: true,
     },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts,
-    },
-    ropsten: {
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts,
-    },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts,
-    },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts,
-    },
-    kovan: {
-      url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts,
-    },
+      url: process.env.NODE_URL,
+      chainId: 1,
+      gas: 6700000,
+    }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
@@ -51,7 +40,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   solidity: {
-    version: '0.8.0',
+    version: '0.6.12',
     settings: {
       optimizer: {
         enabled: true,
