@@ -8,6 +8,6 @@ import "./PTokenBase.sol";
 contract PDAI is PTokenBase {
     constructor(address _controller)
         public
-        PTokenBase("vDAI Pool", "vDAI", 0x6B175474E89094C44Da98b954EedeAC495271d0F, _controller)
+        PTokenBase("pDAI Pool", "pDAI", 0x6B175474E89094C44Da98b954EedeAC495271d0F, _controller)
     {}
 }
