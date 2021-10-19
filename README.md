@@ -25,7 +25,7 @@ npx hardhat
 npx hardhat compile
 
 # run test
-npx hardhat test
+NODE_URL=https://mainnet.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat test
 
 # Run node
 npx hardhat node
