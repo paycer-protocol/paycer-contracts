@@ -28,8 +28,13 @@ contract MultiStrategy is Strategy {
     ) public Strategy(_controller, _pool, _receiptToken) {
     }
 
-    function rebalance() external override {
+    function addNewStrategy(address strategy) public {
+        strategies.push(strategy);
+        ++numStrategies;
+    }
 
+    function rebalance() external override {
+        Strategy(strategy)
     }
 
     function beforeWithdraw() external override {

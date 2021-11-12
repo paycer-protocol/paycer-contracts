@@ -17,6 +17,6 @@ describe('pDAI Pool with MultiStrategy', function () {
     this.newStrategy = 'AaveV2StrategyMulti'
   })
 
-  shouldBehaveLikePool('vDai', 'DAI', 'aDai')
+  shouldBehaveLikePool('pDai', 'DAI', 'aDai')
   // shouldBehaveLikeStrategy('vDai', 'DAI', 'aDai')
 })
