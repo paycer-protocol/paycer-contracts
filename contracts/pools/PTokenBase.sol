@@ -43,14 +43,15 @@ abstract contract PTokenBase is PoolShareToken {
     function approveToken() external virtual onlyController {
         address strategy = controller.strategy(address(this));
         token.safeApprove(strategy, MAX_UINT_VALUE);
-        IERC20(IStrategy(strategy).token()).safeApprove(strategy, MAX_UINT_VALUE);
+        //IERC20(IStrategy(strategy).token()).safeApprove(strategy, MAX_UINT_VALUE); // DEBUG kovan
+        //IERC20(0xe22da380ee6B445bb8273C81944ADEB6E8450422).safeApprove(strategy, MAX_UINT_VALUE); // DEBUG kovan
     }
 
     /// @dev Reset token approval of strategy. Called when updating strategy.
     function resetApproval() external virtual onlyController {
         address strategy = controller.strategy(address(this));
         token.safeApprove(strategy, 0);
-        IERC20(IStrategy(strategy).token()).safeApprove(strategy, 0);
+        //IERC20(IStrategy(strategy).token()).safeApprove(strategy, 0); // DEBUG kovan
     }
 
     /**
