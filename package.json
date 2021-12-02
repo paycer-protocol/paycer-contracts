@@ -4,6 +4,7 @@
   "license": "MIT",
   "description": "Contracts for Paycer the protocol",
   "scripts": {
+    "deploy_to_kovan": "NODE_URL=https://kovan.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat --network kovan deploy",
     "test": "NODE_URL=https://mainnet.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat test"
   },
   "devDependencies": {
