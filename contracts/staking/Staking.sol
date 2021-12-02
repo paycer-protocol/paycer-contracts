@@ -4,15 +4,18 @@ pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/utils/Pausable.sol';
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/math/SignedSafeMath.sol";
 import "@openzeppelin/contracts/utils/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
+
 /// @title Staking Contract
 /// @notice You can use this contract for staking tokens and distribute rewards
 /// @dev All function calls are currently implemented without side effects
-contract Staking is Ownable {
+contract Staking is ReentrancyGuard, Pausable, Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     using SignedSafeMath for int256;
@@ -182,7 +185,7 @@ contract Staking is Ownable {
      * @param amount LP token amount to deposit.
      * @param to The receiver of `amount` deposit benefit.
      */
-    function deposit(uint256 amount, address to) public {
+    function deposit(uint256 amount, address to) public nonReentrant whenNotPaused {
         update(to);
         UserInfo storage user = userInfo[to];
 
@@ -203,7 +206,7 @@ contract Staking is Ownable {
      * @param amount LP token amount to withdraw.
      * @param to Receiver of the LP tokens and rewards.
      */
-    function withdraw(uint256 amount, address to) public {
+    function withdraw(uint256 amount, address to) public nonReentrant whenNotPaused {
         update(to);
         UserInfo storage user = userInfo[msg.sender];
         int256 accumulatedReward = int256(
@@ -231,7 +234,7 @@ contract Staking is Ownable {
      * @dev Here comes the formula to calculate reward token amount
      * @param to Receiver of rewards.
      */
-    function harvest(address to) public {
+    function harvest(address to) public nonReentrant whenNotPaused {
         update(to);
         UserInfo storage user = userInfo[msg.sender];
         int256 accumulatedReward = int256(
@@ -256,7 +259,7 @@ contract Staking is Ownable {
      * @notice Withdraw without caring about rewards. EMERGENCY ONLY.
      * @param to Receiver of the LP tokens.
      */
-    function emergencyWithdraw(address to) public {
+    function emergencyWithdraw(address to) public nonReentrant whenNotPaused {
         UserInfo storage user = userInfo[msg.sender];
         uint256 amount = user.amount;
         user.amount = 0;
