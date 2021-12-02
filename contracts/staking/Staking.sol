@@ -266,4 +266,8 @@ contract Staking is Ownable {
         lpToken.safeTransfer(to, amount);
         emit EmergencyWithdraw(msg.sender, amount, to);
     }
+
+    function renounceOwnership() public override onlyOwner {
+        revert();
+    }
 }
