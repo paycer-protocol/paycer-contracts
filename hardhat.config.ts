@@ -21,13 +21,6 @@ const config: HardhatUserConfig = {
     localhost: {
       saveDeployments: true,
     },
-    hardhat: {
-      forking: {
-        url: process.env.NODE_URL || '',
-        blockNumber: process.env.BLOCK_NUMBER ? parseInt(process.env.BLOCK_NUMBER) : undefined,
-      },
-      saveDeployments: true,
-    },
     mainnet: {
       url: process.env.NODE_URL || '',
       chainId: 1,
