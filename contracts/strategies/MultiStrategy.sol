@@ -34,7 +34,7 @@ contract MultiStrategy is Strategy {
     }
 
     function rebalance() external override {
-        Strategy(strategy)
+        //Strategy(strategy);
     }
 
     function beforeWithdraw() external override {
