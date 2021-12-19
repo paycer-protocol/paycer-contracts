@@ -7,20 +7,22 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments
   const { deployer, rewardTreasury } = await getNamedAccounts()
   
-  const paycerToken = await ethers.getContract('PaycerToken')
+  const paycerToken = await deployments.get('PaycerToken');
 
-
-  await deploy('Staking', {
+  const deployedStaking = await deploy('Staking', {
+    log: true,
     from: deployer,
     args: [
       paycerToken.address, 
-      paycerToken.address // TODO: needs to clearify
+      paycerToken.address 
     ],
-    log: true,
   })
 
-  // TODO: here an execption is thrown. Anyone an idea?
-  const stakingContract = await ethers.getContract('Staking')
+  const stakingContract = await ethers.getContractAt(
+    deployedStaking.abi,
+    deployedStaking.address
+  )
+
   await (await stakingContract.setBaseAPY(1000 /* 10% */)).wait()
   await (await stakingContract.setRewardTreasury(rewardTreasury)).wait()
 }
