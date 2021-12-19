@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "license": "MIT",
   "description": "Contracts for Paycer the protocol",
+  "scripts": {
+    "deploy_to_kovan": "NODE_URL=https://kovan.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat --network kovan deploy",
+    "test": "NODE_URL=https://mainnet.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat test"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.2",

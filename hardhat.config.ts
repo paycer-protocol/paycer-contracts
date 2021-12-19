@@ -24,8 +24,14 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: process.env.NODE_URL || '',
       chainId: 1,
-      gas: 6700000,
-    }
+    },
+    kovan: {
+      url: process.env.NODE_URL,
+      chainId: 42,
+      accounts: [
+        '7c57e2b0a4e4e5467d4467ec605f0780eac6fcdd7b061ef2e1a4427a078a09ce'
+      ]
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,

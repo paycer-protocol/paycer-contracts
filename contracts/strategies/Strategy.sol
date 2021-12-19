@@ -165,7 +165,7 @@ abstract contract Strategy is IStrategy, Pausable {
 
     /// @dev Returns address of token correspond to collateral token
     function token() external view override returns (address) {
-        return receiptToken;
+        return address(collateralToken);
     }
 
     /// @dev Convert from 18 decimals to token defined decimals. Default no conversion.
