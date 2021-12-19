@@ -75,10 +75,19 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
     /**
      * @param _rewardToken The reward token contract address.
      * @param _lpToken The staking contract address.
+     * @param _rewardTreasury The reward treasury contract address.
+     * @param _baseAPY The APY of reward to be distributed per second.
      */
-    constructor(IERC20 _rewardToken, IERC20 _lpToken) public {
+    constructor(
+        IERC20 _rewardToken, 
+        IERC20 _lpToken, 
+        address _rewardTreasury, 
+        uint256 _baseAPY
+    ) public {
         rewardToken = _rewardToken;
         lpToken = _lpToken;
+        rewardTreasury = _rewardTreasury;
+        baseAPY = _baseAPY;
     }
 
     /**

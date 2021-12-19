@@ -9,22 +9,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   
   const paycerToken = await deployments.get('PaycerToken');
 
-  const deployedStaking = await deploy('Staking', {
+  await deploy('Staking', {
     log: true,
     from: deployer,
     args: [
       paycerToken.address, 
-      paycerToken.address 
+      paycerToken.address,
+      rewardTreasury,
+      1000
     ],
   })
-
-  const stakingContract = await ethers.getContractAt(
-    deployedStaking.abi,
-    deployedStaking.address
-  )
-
-  await (await stakingContract.setBaseAPY(1000 /* 10% */)).wait()
-  await (await stakingContract.setRewardTreasury(rewardTreasury)).wait()
 }
 
 export default func

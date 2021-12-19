@@ -35,12 +35,15 @@ describe('Staking Pool', () => {
   beforeEach(async () => {
     lpToken = <PaycerToken>await deployContract("PaycerToken", totalAmount, totalAmount);
     rewardToken = lpToken;
-    staking = <Staking>await deployContract("Staking", rewardToken.address, lpToken.address);
+    staking = <Staking>await deployContract(
+      "Staking", 
+      rewardToken.address, 
+      lpToken.address, 
+      deployer.address, 
+      baseAPY
+    );
 
     apyAccuracy = await staking.APY_ACCURACY();
-
-    await staking.setRewardTreasury(deployer.address);
-    await staking.setBaseAPY(baseAPY);
 
     await rewardToken.transfer(rewardTreasury.address, totalRewardAmount);
     await rewardToken.approve(staking.address, ethers.constants.MaxUint256);
@@ -175,14 +178,14 @@ describe('Staking Pool', () => {
     });
   });
 
-  describe("Harvest", () => {
+  describe("Claim", () => {
     it("Should give back the correct amount of reward", async () => {
       const amount = getBigNumber(50000);
       let log = await staking.deposit(amount, alice.address)
       const apy = await staking.rewardAPY(alice.address);
       await advanceTime(315360);
       const aliceBalanceBefore = await rewardToken.balanceOf(alice.address);
-      let log2 = await staking.connect(alice).harvest(alice.address);
+      let log2 = await staking.connect(alice).claim(alice.address);
       const aliceBalanceAfter = await rewardToken.balanceOf(alice.address);
       let timestamp2 = (await ethers.provider.getBlock(log2.blockNumber!)).timestamp;
       let timestamp = (await ethers.provider.getBlock(log.blockNumber!)).timestamp;
@@ -193,13 +196,13 @@ describe('Staking Pool', () => {
       expect(await staking.pendingReward(alice.address)).to.be.equal(0);
     });
 
-    it("Harvest with empty user balance", async () => {
-      await staking.connect(alice).harvest(alice.address);
+    it("Claim with empty user balance", async () => {
+      await staking.connect(alice).claim(alice.address);
     })
   });
 
   describe("Withdraw", () => {
-    it("Should give back the correct amount of lp token and harvest rewards(withdraw whole amount)", async () => {
+    it("Should give back the correct amount of lp token and claim rewards(withdraw whole amount)", async () => {
       const amount = getBigNumber(150000);
       let log = await staking.deposit(amount, alice.address)
       const apy = await staking.rewardAPY(alice.address);
@@ -269,14 +272,14 @@ describe('Staking Pool', () => {
 
       await staking.deposit(getBigNumber(50000), alice.address)
       await advanceTime(315360);
-      await expect(staking.connect(alice).harvest(alice.address)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+      await expect(staking.connect(alice).claim(alice.address)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
 
       let rewardAmount = await staking.pendingReward(alice.address);
       await rewardToken.connect(rewardTreasury).approve(staking.address, rewardAmount.sub(1));
-      await expect(staking.connect(alice).harvest(alice.address)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+      await expect(staking.connect(alice).claim(alice.address)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
 
       await rewardToken.connect(rewardTreasury).approve(staking.address, totalRewardAmount);
-      await staking.connect(alice).harvest(alice.address);
+      await staking.connect(alice).claim(alice.address);
     });
   });
 
