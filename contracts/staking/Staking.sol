@@ -57,12 +57,12 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
 
     event Deposit(address indexed user, uint256 amount, address indexed to);
     event Withdraw(address indexed user, uint256 amount, address indexed to);
+    event Claim(address indexed user, uint256 amount);
     event EmergencyWithdraw(
         address indexed user,
         uint256 amount,
         address indexed to
     );
-    event Harvest(address indexed user, uint256 amount);
 
     event LogUpdate(
         address indexed user,
@@ -226,15 +226,15 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
         lpToken.safeTransfer(to, amount);
 
         emit Withdraw(msg.sender, amount, to);
-        emit Harvest(msg.sender, _pendingReward);
+        emit Claim(msg.sender, _pendingReward);
     }
 
     /**
-     * @notice Harvest rewards and send to `to`.
+     * @notice Claim rewards and send to `to`.
      * @dev Here comes the formula to calculate reward token amount
      * @param to Receiver of rewards.
      */
-    function harvest(address to) public nonReentrant whenNotPaused {
+    function claim(address to) public nonReentrant whenNotPaused {
         update(to);
         UserInfo storage user = userInfo[msg.sender];
         int256 accumulatedReward = int256(
@@ -252,7 +252,7 @@ contract Staking is ReentrancyGuard, Pausable, Ownable {
             rewardToken.safeTransferFrom(rewardTreasury, to, _pendingReward);
         }
 
-        emit Harvest(msg.sender, _pendingReward);
+        emit Claim(msg.sender, _pendingReward);
     }
 
     /**

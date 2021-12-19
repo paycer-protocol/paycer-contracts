@@ -10,8 +10,10 @@ import './tasks/accounts'
 import { HardhatUserConfig } from 'hardhat/types'
 import { removeConsoleLog } from 'hardhat-preprocessor'
 
+
+// TODO: create final accounts and provide it as env var
 const accounts = {
-  mnemonic: process.env.MNEMONIC,
+  mnemonic: '7c57e2b0a4e4e5467d4467ec605f0780eac6fcdd7b061ef2e1a4427a078a09ce',
 }
 
 
@@ -22,15 +24,14 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
     },
     mainnet: {
-      url: process.env.NODE_URL || '',
+      url: 'https://mainnet.infura.io/v3/e687cba7b033449abeb865f24ef82f83',
       chainId: 1,
+      accounts
     },
     kovan: {
-      url: process.env.NODE_URL,
+      url: 'https://kovan.infura.io/v3/e687cba7b033449abeb865f24ef82f83',
       chainId: 42,
-      accounts: [
-        '7c57e2b0a4e4e5467d4467ec605f0780eac6fcdd7b061ef2e1a4427a078a09ce'
-      ]
+      accounts
     },
   },
   etherscan: {
@@ -38,6 +39,7 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: 0,
+    rewardTreasury: 1,
   },
   solidity: {
     version: '0.6.12',

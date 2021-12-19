@@ -25,13 +25,16 @@ npx hardhat
 npx hardhat compile
 
 # run test
-NODE_URL=https://mainnet.infura.io/v3/5d7094fa89424d45a69aa08e4521378f npx hardhat test
+npx hardhat test
 
 # Run node
 npx hardhat node
 
 # deploy contract to node on localhost
 npx hardhat --network <networkName> deploy
+
+# deploy specified script by tagname
+npx hardhat --network kovan deploy --tags Staking
 ```
 
 # Public Testnet Deployment
