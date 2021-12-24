@@ -10,10 +10,8 @@ import './tasks/accounts'
 import { HardhatUserConfig } from 'hardhat/types'
 import { removeConsoleLog } from 'hardhat-preprocessor'
 
-
-// TODO: create final accounts and provide it as env var
 const accounts = {
-  mnemonic: '7c57e2b0a4e4e5467d4467ec605f0780eac6fcdd7b061ef2e1a4427a078a09ce',
+  mnemonic: process.env.MNEMONIC,
 }
 
 
@@ -24,14 +22,64 @@ const config: HardhatUserConfig = {
       saveDeployments: true,
     },
     mainnet: {
-      url: 'https://mainnet.infura.io/v3/e687cba7b033449abeb865f24ef82f83',
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
       chainId: 1,
+      live: true,
       accounts
     },
     kovan: {
-      url: 'https://kovan.infura.io/v3/e687cba7b033449abeb865f24ef82f83',
+      url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
       chainId: 42,
       accounts
+    },
+    matic: {
+      url: "https://rpc-mainnet.maticvigil.com",
+      accounts,
+      chainId: 137,
+      live: true,
+      saveDeployments: true,
+    },
+    mumbai: {
+      url: "https://rpc-mumbai.maticvigil.com/",
+      accounts,
+      chainId: 80001,
+      live: true,
+      saveDeployments: true,
+      tags: ['staging'],
+      gasMultiplier: 2,
+    },
+    bsc: {
+      url: 'https://bsc-dataseed.binance.org',
+      accounts,
+      chainId: 56,
+      live: true,
+      saveDeployments: true,
+    },
+    'bsc-testnet': {
+      url: 'https://data-seed-prebsc-2-s3.binance.org:8545',
+      accounts,
+      chainId: 97,
+      live: true,
+      saveDeployments: true,
+      tags: ['staging'],
+      gasMultiplier: 2,
+    },
+    avalanche: {
+      url: 'https://api.avax.network/ext/bc/C/rpc',
+      accounts,
+      chainId: 43114,
+      live: true,
+      saveDeployments: true,
+      gasPrice: 470000000000,
+    },
+    fuji: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+      accounts,
+      chainId: 43113,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
     },
   },
   etherscan: {
