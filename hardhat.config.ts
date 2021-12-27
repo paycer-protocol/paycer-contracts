@@ -87,7 +87,9 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: 0,
-    rewardTreasury: 1,
+    testAccount: 1,
+    rewardTreasury: 2,
+    
   },
   solidity: {
     version: '0.6.12',
