@@ -7,15 +7,18 @@ import "../interfaces/uniswap/IUniswapV2Router02.sol";
 import "../interfaces/vesper/IStrategy.sol";
 
 abstract contract PTokenBase is PoolShareToken {
-    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address internal WETH;
 
     constructor(
         string memory name,
         string memory symbol,
         address _token,
+        address _weth,
+        address _addressListFactory,
         address _controller
-    ) public PoolShareToken(name, symbol, _token, _controller) {
+    ) public PoolShareToken(name, symbol, _token, _addressListFactory, _controller) {
         require(_controller != address(0), "Controller address is zero");
+        WETH = _weth;
     }
 
     modifier onlyController() {

@@ -26,14 +26,13 @@ contract Controller is Owned {
     address public founderVault;
     uint256 public founderFee = 5e16;
     address public treasuryPool;
-    address public uniswapRouter = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address public uniswapRouter;
     IAddressList public immutable pools;
 
-    constructor() public {
-        IAddressListFactory addressFactory =
-            //IAddressListFactory(0xD57b41649f822C51a73C44Ba0B3da4A880aF0029); // mainnet
-            IAddressListFactory(0x2A62975b1Dc4f6F8201E15C97E400f51724C8158); // kovan
+    constructor(address _addressListFactory, address _uniswapRouter) public {
+        IAddressListFactory addressFactory = IAddressListFactory(_addressListFactory);
         pools = IAddressList(addressFactory.createList());
+        uniswapRouter = _uniswapRouter;
     }
 
     modifier validPool(address pool) {
@@ -148,6 +147,11 @@ contract Controller is Owned {
         }
         strategy[_pool] = _newStrategy;
         vpool.approveToken();
+    }
+
+    function setStrategyInfo(address _pool, address _swapManager, address _weth) external onlyOwner {
+        IStrategy(strategy[_pool]).setSwapManager(_swapManager);
+        IStrategy(strategy[_pool]).setWETH(_weth);
     }
 
     function updateRebalanceFriction(address _pool, uint256 _f)

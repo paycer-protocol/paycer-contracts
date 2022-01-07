@@ -27,4 +27,8 @@ interface IStrategy {
     function pause() external;
 
     function unpause() external;
+
+    function setSwapManager(address) external;
+
+    function setWETH(address) external;
 }
