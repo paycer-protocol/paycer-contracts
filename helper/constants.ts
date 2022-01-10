@@ -6,7 +6,7 @@ interface Constants {
 
 const constants: Constants = {
     // mainnet
-    "31337": {
+    "1": { // "31337" for local forked testnet:
         addressListFactory: "0xD57b41649f822C51a73C44Ba0B3da4A880aF0029",
         uniswapV2Router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
         swapManager: "0xe382d9f2394A359B01006faa8A1864b8a60d2710",
