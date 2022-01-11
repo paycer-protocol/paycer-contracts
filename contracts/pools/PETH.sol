@@ -9,11 +9,13 @@ contract PETH is PTokenBase {
     TokenLike public immutable weth;
     bool internal shouldDeposit = true;
 
-    constructor(address _controller)
-        public
-        PTokenBase("pETH Pool", "pETH", 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, _controller)
+    constructor(
+        address _token,
+        address _addressListFactory,
+        address _controller
+    ) public PTokenBase("pETH Pool", "pETH", _token, _token, _addressListFactory, _controller)
     {
-        weth = TokenLike(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        weth = TokenLike(_token);
     }
 
     /// @dev Handle incoming ETH to the contract address.

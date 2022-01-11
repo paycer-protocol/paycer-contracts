@@ -6,9 +6,12 @@ import "./PTokenBase.sol";
 
 //solhint-disable no-empty-blocks
 contract PWBTC is PTokenBase {
-    constructor(address _controller)
-        public
-        PTokenBase("pWBTC Pool", "pWBTC", 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, _controller)
+    constructor(
+        address _token,
+        address _weth,
+        address _addressListFactory,
+        address _controller
+    ) public PTokenBase("pWBTC Pool", "pWBTC", _token, _weth, _addressListFactory, _controller)
     {}
 
     /// @dev Convert to 18 decimals from token defined decimals.

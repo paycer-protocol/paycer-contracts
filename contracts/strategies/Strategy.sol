@@ -25,7 +25,7 @@ abstract contract Strategy is IStrategy, Pausable {
     address public immutable override pool;
     IAddressListExt public keepers;
     address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address internal WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     uint256 internal constant MAX_UINT_VALUE = type(uint256).max;
 
     event UpdatedSwapManager(address indexed previousSwapManager, address indexed newSwapManager);
@@ -72,6 +72,14 @@ abstract contract Strategy is IStrategy, Pausable {
 
     function unpause() external override onlyController {
         _unpause();
+    }
+
+    function setSwapManager(address _swapManager) external override onlyController {
+        swapManager = ISwapManager(_swapManager);
+    }
+
+    function setWETH(address _weth) external override onlyController {
+        WETH = _weth;
     }
 
     /// @dev Approve all required tokens
