@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 // KeeperCompatible.sol imports the functions from both ./KeeperBase.sol and
 // ./interfaces/KeeperCompatibleInterface.sol
 import "@chainlink/contracts/src/v0.6/KeeperCompatible.sol";
-import "strategies/MultiStrategy.sol";
+import "./strategies/MultiStrategy.sol";
 
 contract Counter is KeeperCompatibleInterface {
     /**
@@ -19,7 +19,7 @@ contract Counter is KeeperCompatibleInterface {
     uint public lastTimeStamp;
     MultiStrategy public strategy;
 
-    constructor(uint updateInterval, MultiStrategy _strategy) {
+    constructor(uint updateInterval, MultiStrategy _strategy) public {
       interval = updateInterval;
       lastTimeStamp = block.timestamp;
       strategy = _strategy;

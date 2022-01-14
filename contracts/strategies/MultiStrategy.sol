@@ -33,6 +33,10 @@ contract MultiStrategy is Strategy {
         ++numStrategies;
     }
 
+    function needsRebalance() public view returns(bool) {
+        return true;
+    }
+
     function rebalance() external override {
         //Strategy(strategy);
     }
