@@ -52,8 +52,8 @@ abstract contract PoolShareToken is ERC20, Pausable, ReentrancyGuard {
         token = IERC20(_token);
         controller = IController(_controller);
         IAddressListFactory factory =
-            //IAddressListFactory(0xD57b41649f822C51a73C44Ba0B3da4A880aF0029); // mainnet
-            IAddressListFactory(0x2A62975b1Dc4f6F8201E15C97E400f51724C8158); // kovan
+            IAddressListFactory(0xD57b41649f822C51a73C44Ba0B3da4A880aF0029); // mainnet
+            //IAddressListFactory(0x2A62975b1Dc4f6F8201E15C97E400f51724C8158); // kovan
         IAddressListExt _feeWhiteList = IAddressListExt(factory.createList());
         _feeWhiteList.grantRole(keccak256("LIST_ADMIN"), _controller);
         feeWhiteList = _feeWhiteList;

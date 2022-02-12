@@ -31,8 +31,8 @@ contract Controller is Owned {
 
     constructor() public {
         IAddressListFactory addressFactory =
-            //IAddressListFactory(0xD57b41649f822C51a73C44Ba0B3da4A880aF0029); // mainnet
-            IAddressListFactory(0x2A62975b1Dc4f6F8201E15C97E400f51724C8158); // kovan
+            IAddressListFactory(0xD57b41649f822C51a73C44Ba0B3da4A880aF0029); // mainnet
+            //IAddressListFactory(0x2A62975b1Dc4f6F8201E15C97E400f51724C8158); // kovan
         pools = IAddressList(addressFactory.createList());
     }
 
